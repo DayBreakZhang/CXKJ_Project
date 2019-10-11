@@ -1,0 +1,34 @@
+{
+    "AppNmae":"CrashRpt Console",
+    "APPVersion":"0.0.1",
+    "EmailSubject":"CrashRpt Console Test 1.0.0 Error Report",
+    "EmailTo":"xxx@gmial.com",
+    "HeartBeatTime":"100",
+    "OverTime":"200",
+    "LocalHostIP":"127.0.0.1",
+    "LocalHostPort":"8080",
+    "ServerIP":"192.168.2.1",
+    "ServerPort":"8080",
+    "ProcessList":[
+        {
+            "ProcessGuid":"1677FA80-84EF-4262-9C7A-0DA26FBFC60E",
+            "ProcessName":"test01",
+            "ProcessPath":"e:/a/c",
+            "ProcessSystem":"windows",
+            "ProcessDumpType":1,
+            "ProcessRestartPar":"sdf cd se",
+            "ProcessSignalType":1,
+            "DumpParameter":{
+                "DumpPaht":"d:/deump.dump",
+                "DumpScreenCapture":"d:/deump.jpg",
+                "DumpLog":"d:/log/",
+                "DumpSystemLog":"d:/system/",
+                "DumpSendEmail":"a@126.com"
+            },            
+            "SignalParameter":{
+                "SignalFormat":"@1s%s@2s%s@3d%d",
+                "SignalSharedMemory":"sm001"
+            }
+        }
+    ]
+}

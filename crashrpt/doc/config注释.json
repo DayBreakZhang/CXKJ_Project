@@ -1,0 +1,34 @@
+{
+    "AppNmae":"应用名称",
+    "APPVersion":"版本",
+    "EmailSubject":"描述",
+    "EmailTo":"邮箱",
+    "HeartBeatTime":"心跳测试间隔",
+    "OverTime":"超时时间",
+    "LocalHostIP":"本机服务ip",
+    "LocalHostPort":"本机端口",
+    "ServerIP":"服务ip",
+    "ServerPort":"服务端口",
+    "ProcessList":[
+        {
+            "ProcessGuid":"进程guid",
+            "ProcessName":"进程名字",
+            "ProcessPath":"进程路径",
+            "ProcessSystem":"进程运行环境",
+            "ProcessDumpType":"生成dump规格 0(生成dump不重启程序)1(重启不生成dump)2(重启生成dump)3(重启生成dump 截图 打包日志和系统日志) 4(打包完成发送email)",
+            "ProcessRestartPar":"重启进场需要的参数",
+            "ProcessSignalType":"进程通信方式 0(只是查找进程存在与否) 3(sharedmemory)",
+            "DumpParameter":{
+                "DumpPaht":"生成dump目录",
+                "DumpScreenCapture":"生成截图",
+                "DumpLog":"程序log目录",
+                "DumpSystemLog":"系统信息",
+                "DumpSendEmail":"接收dump email"
+            },            
+            "SignalParameter":{
+                "SignalFormat":"通信格式 以@符号间隔 后面跟序号 后面是格式化字符串 后面跟实际数据 例子@1s%s@2d%d 表示第一参数是字符串类型第二参数是数字类型",
+                "SignalSharedMemory":"共享内存模式下名字"
+            }
+        }
+    ]
+}

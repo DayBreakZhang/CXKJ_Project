@@ -1,0 +1,53 @@
+if (CMAKE_VERSION VERSION_LESS 2.8.9)
+    message(FATAL_ERROR "CXKJ requires at least CMake version 2.8.9")
+endif()
+
+if (NOT CXKJ_FIND_COMPONENTS)
+    set(CXKJ_NOT_FOUND_MESSAGE "The CXKJ package requires at least one component")
+    set(CXKJ_FOUND False)
+    return()
+endif()
+
+set(_CXKJ_FIND_PARTS_REQUIRED)
+if (CXKJ_FIND_REQUIRED)
+    set(_CXKJ_FIND_PARTS_REQUIRED REQUIRED)
+endif()
+set(_CXKJ_FIND_PARTS_QUIET)
+if (CXKJ_FIND_QUIETLY)
+    set(_CXKJ_FIND_PARTS_QUIET QUIET)
+endif()
+
+get_filename_component(_CXKJ_install_prefix "${CMAKE_CURRENT_LIST_DIR}" ABSOLUTE)
+
+set(_CXKJ_NOTFOUND_MESSAGE)
+
+# Let components find each other, but don't overwrite CMAKE_PREFIX_PATH
+set(_CXKJ_CMAKE_PREFIX_PATH_old ${CMAKE_PREFIX_PATH})
+set(CMAKE_PREFIX_PATH ${_CXKJ_install_prefix})
+
+foreach(module ${CXKJ_FIND_COMPONENTS})
+    find_package(CXKJ${module}
+        ${_CXKJ_FIND_PARTS_QUIET}
+        ${_CXKJ_FIND_PARTS_REQUIRED}
+        PATHS "${_CXKJ_install_prefix}" NO_DEFAULT_PATH
+    )
+    if (NOT CXKJ${module}_FOUND)
+        if (CXKJ_FIND_REQUIRED_${module})
+            set(_CXKJ_NOTFOUND_MESSAGE "${_CXKJ_NOTFOUND_MESSAGE}Failed to find CXKJ component \"${module}\" config file at \"${_CXKJ_install_prefix}/CXKJ${module}/CXKJ${module}Config.cmake\"\n")
+        elseif(NOT CXKJ_FIND_QUIETLY)
+            message(WARNING "Failed to find CXKJ component \"${module}\" config file at \"${_CXKJ_install_prefix}/CXKJ${module}/CXKJ${module}Config.cmake\"")
+        endif()
+    endif()
+
+    # For backward compatibility set the LIBRARIES variable
+    list(APPEND CXKJ_LIBRARIES "CXKJ::${module}")
+endforeach()
+
+# Restore the original CMAKE_PREFIX_PATH value
+set(CMAKE_PREFIX_PATH ${_CXKJ_CMAKE_PREFIX_PATH_old})
+
+if (_CXKJ_NOTFOUND_MESSAGE)
+    set(CXKJ_NOT_FOUND_MESSAGE "${_CXKJ_NOTFOUND_MESSAGE}")
+    set(CXKJ_FOUND False)
+endif()
+
