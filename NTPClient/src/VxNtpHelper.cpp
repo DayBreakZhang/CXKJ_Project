@@ -53,7 +53,8 @@
 
 static inline x_void_t ts_output(x_cstring_t xszt_name, const x_ntp_time_context_t * const xtm_ctxt)
 {
-    printf("\t%s : %04d-%02d-%02d_%02d-%02d-%02d.%03d\n",
+	char srclog[1024] = { '\0' };
+    sprintf(srclog,"\t%s : %04d-%02d-%02d_%02d-%02d-%02d.%03d\n",
         xszt_name           ,
         xtm_ctxt->xut_year  ,
         xtm_ctxt->xut_month ,
@@ -62,6 +63,7 @@ static inline x_void_t ts_output(x_cstring_t xszt_name, const x_ntp_time_context
         xtm_ctxt->xut_minute,
         xtm_ctxt->xut_second,
         xtm_ctxt->xut_msec  );
+	LOG(INFO) << srclog;
 }
 
 static inline x_void_t tn_output(x_cstring_t xszt_name, const x_ntp_timestamp_t * const xtm_stamp)
@@ -406,7 +408,7 @@ x_bool_t SetSystemTime_u(x_uint64_t xut_time)
 {
 	x_int64_t xtm_value=ntp_gettimevalue();
 	x_int64_t xit_temp = (x_int64_t)(labs(xut_time - xtm_value)/10000);//毫秒
-	printf("\tntp - localhost =%I64d \n", xit_temp);
+	LOG(INFO)<<"ntpTime - LocalHostTime="<< xit_temp;
 	if (xit_temp > 30) {
 #ifdef _MSC_VER
 		ULARGE_INTEGER xtime_value;
@@ -923,9 +925,7 @@ x_int32_t ntp_get_time(x_cstring_t xszt_host, x_uint16_t xut_port, x_uint32_t xu
 
     for (std::vector< std::string >::iterator itvec = xvec_host.begin(); itvec != xvec_host.end(); ++itvec)
     {
-        XOUTLINE("========================================");
-        XOUTLINE("  %s -> %s\n", xszt_host, itvec->c_str());
-
+		LOG(INFO) << "NTPServer IP:" << xszt_host << " toIP:" << itvec->c_str();
         xit_err = ntp_get_time_values(itvec->c_str(), xut_port, xut_tmout, xit_tmlst);
         if (0 == xit_err)
         {

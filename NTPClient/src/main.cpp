@@ -72,24 +72,30 @@ int main(int argc, char * argv[])
 	//初始化G3log
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
 	const std::string path_to_log_file = argv[4];
-	std::string cmdPaht = "mkdir -p " + path_to_log_file;
+	std::string cmdPaht = "mkdir \"" + path_to_log_file+"\"";
 	system(cmdPaht.c_str());
 #else
 	const std::string path_to_log_file = "/tmp/NTPClinetLog/";
 #endif
-	auto worker = g3::LogWorker::createLogWorker();
-	auto handle = worker->addDefaultLogger("NtpClient", path_to_log_file,"CXKJ");
-	g3::initializeLogging(worker.get());
-	std::future<std::string> log_file_name = handle->call(&g3::FileSink::fileName);
-	std::cout << "**** G3LOG FATAL EXAMPLE ***\n\n"
-		<< "Choose your type of fatal exit, then "
-		<< " read the generated log and backtrace.\n"
-		<< "The logfile is generated at:  [" << log_file_name.get() << "]\n\n" << std::endl;
+	std::unique_ptr<g3::LogWorker> logworker{ g3::LogWorker::createLogWorker() };
+	auto sinkHandle = logworker->addSink(std::make_unique<g3::FileSink>("NtpClient", path_to_log_file, "CXKJ"),
+		&g3::FileSink::fileWrite);
+	
+	g3::initializeLogging(logworker.get());
+	std::future<std::string> log_file_name = sinkHandle->call(&g3::FileSink::fileName);
+	std::cout<< "日志路径： [" << log_file_name.get() << "]" << std::endl;
+	//设置消息最大字节数
+	g3::only_change_at_initialization::setMaxMessageSize(2048);
+	//设置log文件大小
+	// You can call in a thread safe manner public functions on the logrotate sink
+   // The call is asynchronously executed on your custom sink.
+	//const int k10MBInBytes = 10 * 1024 * 1024;
+	//std::future<void> received = sinkHandle->call(&g3::LogRLogRotate::setMaxLogSize, k10MBInBytes);
 	// Exmple of overriding the default formatting of log entry
-	auto changeFormatting = handle->call(&g3::FileSink::overrideLogDetails, g3::LogMessage::FullLogDetailsToString);
+	auto changeFormatting = sinkHandle->call(&g3::FileSink::overrideLogDetails, g3::LogMessage::FullLogDetailsToString);
 	const std::string newHeader = "\t\tLOG format: [YYYY/MM/DD hh:mm:ss uuu* LEVEL THREAD_ID FILE->FUNCTION:LINE] message\n\t\t(uuu*: microseconds fractions of the seconds value)\n\n";
 	// example of ovrriding the default formatting of header
-	auto changeHeader = handle->call(&g3::FileSink::overrideLogHeader, newHeader);
+	auto changeHeader = sinkHandle->call(&g3::FileSink::overrideLogHeader, newHeader);
 
 	changeFormatting.wait();
 	changeHeader.wait();
@@ -101,9 +107,16 @@ int main(int argc, char * argv[])
 #ifdef _WIN32
    vxWSASocketInit gInit;
 #endif // _WIN32
-
+   LOG(INFO) << "NTP Server:" << argv[1];
+   LOG(INFO) << "NTP TimeOut:" << argv[2] << "毫秒/单位";
+   LOG(INFO) << "NTP PollTime:" << argv[3] << "分钟/单位";
+   double count = 0;
    while (1)
    {
+	   printf("第%d次查询NTP(%s)服务",count, argv[1]);
+	   count++;
+	   LOG(INFO) << "NTP Poll Count:" << count;
+
 	   long _sleeptime = atoi(argv[3]) * 60;
 
 	   //执行ntp
