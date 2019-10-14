@@ -72,11 +72,13 @@ int main(int argc, char * argv[])
 	//初始化G3log
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
 	const std::string path_to_log_file = argv[4];
+	std::string cmdPaht = "mkdir -p " + path_to_log_file;
+	system(cmdPaht.c_str());
 #else
 	const std::string path_to_log_file = "/tmp/NTPClinetLog/";
 #endif
 	auto worker = g3::LogWorker::createLogWorker();
-	auto handle = worker->addDefaultLogger(argv[0], path_to_log_file);
+	auto handle = worker->addDefaultLogger("NtpClient", path_to_log_file,"CXKJ");
 	g3::initializeLogging(worker.get());
 	std::future<std::string> log_file_name = handle->call(&g3::FileSink::fileName);
 	std::cout << "**** G3LOG FATAL EXAMPLE ***\n\n"
